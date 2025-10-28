@@ -97,25 +97,61 @@ export function assignQueries(queries: Query[], lawyers: Lawyer[]): Query[] {
 }
 
 export function parseExcelDate(excelDate: any): Date {
+  // If it's already a valid Date
   if (excelDate instanceof Date && !isNaN(excelDate.getTime())) {
     return excelDate;
   }
   
-  if (typeof excelDate === 'number') {
-    // Excel dates are days since 1900-01-01
+  // If it's an Excel numeric date
+  if (typeof excelDate === 'number' && excelDate > 0) {
+    // Excel dates are days since 1900-01-01 (with leap year bug correction)
     const date = new Date((excelDate - 25569) * 86400 * 1000);
     if (!isNaN(date.getTime())) {
       return date;
     }
   }
   
-  if (typeof excelDate === 'string') {
-    const date = new Date(excelDate);
+  // If it's a string, try different parsing methods
+  if (typeof excelDate === 'string' && excelDate.trim() !== '') {
+    // Try ISO format first
+    let date = new Date(excelDate);
     if (!isNaN(date.getTime())) {
       return date;
+    }
+    
+    // Try dd/MM/yyyy format
+    const parts = excelDate.split(/[\/\-\.]/);
+    if (parts.length === 3) {
+      // Try dd/MM/yyyy
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed
+      const year = parseInt(parts[2], 10);
+      date = new Date(year, month, day);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    
+    // Try dd/MM/yyyy HH:mm format
+    const dateTimeParts = excelDate.split(' ');
+    if (dateTimeParts.length === 2) {
+      const dateParts = dateTimeParts[0].split(/[\/\-\.]/);
+      const timeParts = dateTimeParts[1].split(':');
+      if (dateParts.length === 3 && timeParts.length >= 2) {
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1;
+        const year = parseInt(dateParts[2], 10);
+        const hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        date = new Date(year, month, day, hours, minutes);
+        if (!isNaN(date.getTime())) {
+          return date;
+        }
+      }
     }
   }
   
   // Return current date as fallback for invalid dates
+  console.warn('Invalid date format, using current date:', excelDate);
   return new Date();
 }
