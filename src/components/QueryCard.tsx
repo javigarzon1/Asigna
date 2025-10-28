@@ -55,11 +55,15 @@ export function QueryCard({ query, onStatusChange }: QueryCardProps) {
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
-            <span>Entrada: {format(query.entryDate, "dd/MM/yyyy HH:mm", { locale: es })}</span>
+            <span>Entrada: {query.entryDate instanceof Date && !isNaN(query.entryDate.getTime()) 
+              ? format(query.entryDate, "dd/MM/yyyy HH:mm", { locale: es })
+              : "Fecha inválida"}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Clock className="h-4 w-4" />
-            <span>Vence: {format(query.deadline, "dd/MM/yyyy HH:mm", { locale: es })}</span>
+            <span>Vence: {query.deadline instanceof Date && !isNaN(query.deadline.getTime())
+              ? format(query.deadline, "dd/MM/yyyy HH:mm", { locale: es })
+              : "Fecha inválida"}</span>
           </div>
         </div>
 

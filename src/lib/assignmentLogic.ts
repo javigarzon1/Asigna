@@ -97,19 +97,25 @@ export function assignQueries(queries: Query[], lawyers: Lawyer[]): Query[] {
 }
 
 export function parseExcelDate(excelDate: any): Date {
-  if (excelDate instanceof Date) {
+  if (excelDate instanceof Date && !isNaN(excelDate.getTime())) {
     return excelDate;
   }
   
   if (typeof excelDate === 'number') {
     // Excel dates are days since 1900-01-01
     const date = new Date((excelDate - 25569) * 86400 * 1000);
-    return date;
+    if (!isNaN(date.getTime())) {
+      return date;
+    }
   }
   
   if (typeof excelDate === 'string') {
-    return new Date(excelDate);
+    const date = new Date(excelDate);
+    if (!isNaN(date.getTime())) {
+      return date;
+    }
   }
   
+  // Return current date as fallback for invalid dates
   return new Date();
 }
