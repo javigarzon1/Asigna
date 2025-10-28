@@ -280,6 +280,7 @@ const Index = () => {
           <TabsContent value="lawyers">
             <LawyerManagement
               lawyers={lawyers}
+              queries={queries}
               onUpdateLawyer={handleUpdateLawyer}
             />
           </TabsContent>
