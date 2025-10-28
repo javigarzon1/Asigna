@@ -65,20 +65,33 @@ const Index = () => {
       currentAssignments: counts.get(lawyer.id) || 0
     })));
 
-    // Show assignment summary
-    const assignmentSummary = assigned
-      .filter(q => q.assignedLawyer)
-      .map(q => `${q.ritm}: ${q.assignedLawyer}`)
-      .join('\n');
-    
+    // Show assignment summary with custom component
+    const assignedQueries = assigned.filter(q => q.assignedLawyer);
     const unassigned = assigned.filter(q => !q.assignedLawyer).length;
-    
-    const message = assignmentSummary + 
-      (unassigned > 0 ? `\n\n${unassigned} consultas sin asignar` : '');
 
     toast.success(`Se han cargado ${assigned.length} consultas`, {
-      description: message,
-      duration: 10000,
+      description: (
+        <div className="space-y-3 mt-2">
+          <div className="font-semibold text-base">Resumen de Asignaciones:</div>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {assignedQueries.map((q, index) => (
+              <div key={index} className="flex items-start gap-2 text-base">
+                <span className="font-medium text-primary min-w-[120px]">{q.ritm}</span>
+                <span className="text-muted-foreground">→</span>
+                <span className="font-medium">{q.assignedLawyer}</span>
+              </div>
+            ))}
+          </div>
+          {unassigned > 0 && (
+            <div className="pt-2 border-t border-border">
+              <span className="text-warning font-semibold text-base">
+                ⚠️ {unassigned} consultas sin asignar
+              </span>
+            </div>
+          )}
+        </div>
+      ),
+      duration: 15000,
     });
   };
 
