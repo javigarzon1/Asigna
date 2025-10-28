@@ -65,7 +65,21 @@ const Index = () => {
       currentAssignments: counts.get(lawyer.id) || 0
     })));
 
-    toast.success(`Se han cargado y asignado ${assigned.length} consultas correctamente`);
+    // Show assignment summary
+    const assignmentSummary = assigned
+      .filter(q => q.assignedLawyer)
+      .map(q => `${q.ritm}: ${q.assignedLawyer}`)
+      .join('\n');
+    
+    const unassigned = assigned.filter(q => !q.assignedLawyer).length;
+    
+    const message = assignmentSummary + 
+      (unassigned > 0 ? `\n\n${unassigned} consultas sin asignar` : '');
+
+    toast.success(`Se han cargado ${assigned.length} consultas`, {
+      description: message,
+      duration: 10000,
+    });
   };
 
   const handleUpdateLawyer = (lawyerId: string, updates: Partial<Lawyer>) => {

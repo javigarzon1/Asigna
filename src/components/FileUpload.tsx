@@ -28,7 +28,7 @@ export function FileUpload({ onFileLoaded }: FileUploadProps) {
         
         return {
           id: `query-${index}-${Date.now()}`,
-          ritm: row["RITM"] || row["Número"] || `RITM${index}`,
+          ritm: row["ID consultas"] || row["RITM"] || row["Número"] || `RITM${index}`,
           typology: row["TIPOLOGIA"] || row["Tipología"] || "Sin especificar",
           entryDate,
           deadline,
