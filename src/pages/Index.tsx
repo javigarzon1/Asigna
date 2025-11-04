@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Scale, Search, Filter, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [queries, setQueries] = useState<Query[]>([]);
@@ -45,7 +46,7 @@ const Index = () => {
     setFilteredQueries(filtered);
   }, [queries, searchTerm, statusFilter, urgentFilter]);
 
-  const handleFileLoaded = (loadedQueries: Query[]) => {
+  const handleFileLoaded = async (loadedQueries: Query[]) => {
     const assigned = assignQueries(loadedQueries, lawyers);
     setQueries(assigned);
     
@@ -93,6 +94,57 @@ const Index = () => {
       ),
       duration: 15000,
     });
+
+    // Enviar emails automáticamente para consultas urgentes
+    const urgentQueries = assigned.filter(q => q.isUrgent && q.assignedLawyer);
+    
+    if (urgentQueries.length > 0) {
+      const lawyersWithUrgent = new Map<string, Query[]>();
+      
+      urgentQueries.forEach(query => {
+        const email = query.assignedLawyerEmail!;
+        if (!lawyersWithUrgent.has(email)) {
+          lawyersWithUrgent.set(email, []);
+        }
+        lawyersWithUrgent.get(email)!.push(query);
+      });
+
+      const updatedLawyers = lawyers.map(l => ({
+        ...l,
+        currentAssignments: counts.get(l.id) || 0
+      }));
+
+      for (const [email, queries] of lawyersWithUrgent.entries()) {
+        const lawyer = updatedLawyers.find(l => l.email === email);
+        if (lawyer) {
+          try {
+            await supabase.functions.invoke("send-lawyer-notification", {
+              body: {
+                lawyerName: lawyer.name,
+                lawyerEmail: lawyer.email,
+                queries: queries.map(q => ({
+                  ritm: q.ritm,
+                  typology: q.typology,
+                  isUrgent: q.isUrgent,
+                  deadline: q.deadline.toISOString(),
+                  status: q.status
+                })),
+                isAutomatic: true
+              },
+            });
+            
+            console.log(`Auto-sent urgent queries notification to ${lawyer.name}`);
+          } catch (error) {
+            console.error(`Error sending automatic email to ${lawyer.name}:`, error);
+          }
+        }
+      }
+
+      toast.info(
+        `📧 Se han enviado ${lawyersWithUrgent.size} emails automáticos por consultas urgentes`,
+        { duration: 5000 }
+      );
+    }
   };
 
   const handleUpdateLawyer = (lawyerId: string, updates: Partial<Lawyer>) => {
