@@ -5,8 +5,6 @@ import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { Lawyer } from "@/types/lawyer";
-import { Query } from "@/types/query";
 import { Users, Calendar, AlertCircle, Building2, FileText, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -15,16 +13,10 @@ import { ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface LawyerManagementProps {
-  lawyers: Lawyer[];
-  queries: Query[];
-  onUpdateLawyer: (lawyerId: string, updates: Partial<Lawyer>) => void;
-}
+export function LawyerManagement({ lawyers, queries, onUpdateLawyer }) {
+  const [sendingEmail, setSendingEmail] = useState(null);
 
-export function LawyerManagement({ lawyers, queries, onUpdateLawyer }: LawyerManagementProps) {
-  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
-
-  const handleSendEmail = async (lawyer: Lawyer) => {
+  const handleSendEmail = async (lawyer) => {
     const lawyerQueries = queries.filter(
       (q) => q.assignedLawyerEmail === lawyer.email
     );
@@ -74,8 +66,8 @@ export function LawyerManagement({ lawyers, queries, onUpdateLawyer }: LawyerMan
     }
   };
 
-  const getStatusLabel = (status: Query["status"]) => {
-    const labels: Record<Query["status"], string> = {
+  const getStatusLabel = (status) => {
+    const labels = {
       pending: "Pendiente",
       in_process: "En Proceso",
       completed: "Finalizada",
@@ -86,8 +78,8 @@ export function LawyerManagement({ lawyers, queries, onUpdateLawyer }: LawyerMan
     return labels[status];
   };
 
-  const getStatusVariant = (status: Query["status"]) => {
-    const variants: Record<Query["status"], "default" | "secondary" | "success" | "warning"> = {
+  const getStatusVariant = (status) => {
+    const variants = {
       pending: "warning",
       in_process: "default",
       completed: "success",

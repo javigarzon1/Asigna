@@ -1,14 +1,7 @@
 import { Card } from "./ui/card";
 import { FileCheck, Users, AlertCircle, Clock } from "lucide-react";
-import { Query } from "@/types/query";
-import { Lawyer } from "@/types/lawyer";
 
-interface DashboardProps {
-  queries: Query[];
-  lawyers: Lawyer[];
-}
-
-export function Dashboard({ queries, lawyers }: DashboardProps) {
+export function Dashboard({ queries, lawyers }) {
   const totalQueries = queries.length;
   const urgentQueries = queries.filter(q => q.isUrgent).length;
   const assignedQueries = queries.filter(q => q.assignedLawyer).length;

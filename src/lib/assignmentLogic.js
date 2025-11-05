@@ -1,7 +1,4 @@
-import { Lawyer, Typology } from "@/types/lawyer";
-import { Query } from "@/types/query";
-
-export function canLawyerHandleQuery(lawyer: Lawyer, query: Query): boolean {
+export function canLawyerHandleQuery(lawyer, query) {
   // Check if lawyer is available (workPercentage > 0)
   if (lawyer.workPercentage === 0) {
     return false;
@@ -22,9 +19,9 @@ export function canLawyerHandleQuery(lawyer: Lawyer, query: Query): boolean {
   );
 }
 
-export function assignQueries(queries: Query[], lawyers: Lawyer[]): Query[] {
-  const assignedQueries: Query[] = [];
-  const lawyerAssignments = new Map<string, number>();
+export function assignQueries(queries, lawyers) {
+  const assignedQueries = [];
+  const lawyerAssignments = new Map();
 
   // Initialize lawyer assignments
   lawyers.forEach(lawyer => {
@@ -96,7 +93,7 @@ export function assignQueries(queries: Query[], lawyers: Lawyer[]): Query[] {
   return assignedQueries;
 }
 
-export function parseExcelDate(excelDate: any): Date {
+export function parseExcelDate(excelDate) {
   // If it's already a valid Date
   if (excelDate instanceof Date && !isNaN(excelDate.getTime())) {
     return excelDate;
@@ -120,7 +117,7 @@ export function parseExcelDate(excelDate: any): Date {
     }
     
     // Try dd/MM/yyyy format
-    const parts = excelDate.split(/[\/\-\.]/);
+    const parts = excelDate.split(/[\\/\-\.]/);
     if (parts.length === 3) {
       // Try dd/MM/yyyy
       const day = parseInt(parts[0], 10);
@@ -135,7 +132,7 @@ export function parseExcelDate(excelDate: any): Date {
     // Try dd/MM/yyyy HH:mm format
     const dateTimeParts = excelDate.split(' ');
     if (dateTimeParts.length === 2) {
-      const dateParts = dateTimeParts[0].split(/[\/\-\.]/);
+      const dateParts = dateTimeParts[0].split(/[\\/\-\.]/);
       const timeParts = dateTimeParts[1].split(':');
       if (dateParts.length === 3 && timeParts.length >= 2) {
         const day = parseInt(dateParts[0], 10);

@@ -2,15 +2,10 @@ import { Upload, FileSpreadsheet } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import * as XLSX from "xlsx";
-import { Query } from "@/types/query";
 import { parseExcelDate } from "@/lib/assignmentLogic";
 
-interface FileUploadProps {
-  onFileLoaded: (queries: Query[]) => void;
-}
-
-export function FileUpload({ onFileLoaded }: FileUploadProps) {
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+export function FileUpload({ onFileLoaded }) {
+  const handleFileUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -22,7 +17,7 @@ export function FileUpload({ onFileLoaded }: FileUploadProps) {
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      const queries: Query[] = jsonData.map((row: any, index) => {
+      const queries = jsonData.map((row, index) => {
         const entryDate = parseExcelDate(row["FECHA ALTA"] || row["Fecha Alta"] || new Date());
         const deadline = parseExcelDate(row["FECHA FIN SLA"] || row["Fecha Fin SLA"] || new Date());
         

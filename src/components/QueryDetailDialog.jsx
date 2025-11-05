@@ -1,4 +1,3 @@
-import { Query } from "@/types/query";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +10,7 @@ import { Calendar, Clock, User, FileText, Building, AlertCircle } from "lucide-r
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-interface QueryDetailDialogProps {
-  query: Query | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "success" | "warning" | "destructive" }> = {
+const statusConfig = {
   pending: { label: "Pendiente", variant: "warning" },
   in_process: { label: "En Proceso", variant: "default" },
   completed: { label: "Finalizada", variant: "success" },
@@ -26,10 +19,10 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
   info_requested: { label: "Solicitada información", variant: "secondary" }
 };
 
-export function QueryDetailDialog({ query, open, onOpenChange }: QueryDetailDialogProps) {
+export function QueryDetailDialog({ query, open, onOpenChange }) {
   if (!query) return null;
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     if (date instanceof Date && !isNaN(date.getTime())) {
       return format(date, "dd/MM/yyyy HH:mm", { locale: es });
     }

@@ -3,8 +3,7 @@ import { FileUpload } from "@/components/FileUpload";
 import { QueryCard } from "@/components/QueryCard";
 import { LawyerManagement } from "@/components/LawyerManagement";
 import { Dashboard } from "@/components/Dashboard";
-import { Query, QueryStatus } from "@/types/query";
-import { Lawyer, lawyers as initialLawyers } from "@/types/lawyer";
+import { lawyers as initialLawyers } from "@/types/lawyer";
 import { assignQueries } from "@/lib/assignmentLogic";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,12 +14,12 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const [queries, setQueries] = useState<Query[]>([]);
-  const [lawyers, setLawyers] = useState<Lawyer[]>(initialLawyers);
-  const [filteredQueries, setFilteredQueries] = useState<Query[]>([]);
+  const [queries, setQueries] = useState([]);
+  const [lawyers, setLawyers] = useState(initialLawyers);
+  const [filteredQueries, setFilteredQueries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<QueryStatus | "all">("all");
-  const [urgentFilter, setUrgentFilter] = useState<"all" | "urgent" | "normal">("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [urgentFilter, setUrgentFilter] = useState("all");
 
   useEffect(() => {
     let filtered = queries;
@@ -46,12 +45,12 @@ const Index = () => {
     setFilteredQueries(filtered);
   }, [queries, searchTerm, statusFilter, urgentFilter]);
 
-  const handleFileLoaded = async (loadedQueries: Query[]) => {
+  const handleFileLoaded = async (loadedQueries) => {
     const assigned = assignQueries(loadedQueries, lawyers);
     setQueries(assigned);
     
     // Update lawyer assignment counts
-    const counts = new Map<string, number>();
+    const counts = new Map();
     assigned.forEach(query => {
       if (query.assignedLawyerEmail) {
         const lawyer = lawyers.find(l => l.email === query.assignedLawyerEmail);
@@ -99,14 +98,14 @@ const Index = () => {
     const urgentQueries = assigned.filter(q => q.isUrgent && q.assignedLawyer);
     
     if (urgentQueries.length > 0) {
-      const lawyersWithUrgent = new Map<string, Query[]>();
+      const lawyersWithUrgent = new Map();
       
       urgentQueries.forEach(query => {
-        const email = query.assignedLawyerEmail!;
+        const email = query.assignedLawyerEmail;
         if (!lawyersWithUrgent.has(email)) {
           lawyersWithUrgent.set(email, []);
         }
-        lawyersWithUrgent.get(email)!.push(query);
+        lawyersWithUrgent.get(email).push(query);
       });
 
       const updatedLawyers = lawyers.map(l => ({
@@ -147,7 +146,7 @@ const Index = () => {
     }
   };
 
-  const handleUpdateLawyer = (lawyerId: string, updates: Partial<Lawyer>) => {
+  const handleUpdateLawyer = (lawyerId, updates) => {
     setLawyers(prev => 
       prev.map(lawyer => 
         lawyer.id === lawyerId ? { ...lawyer, ...updates } : lawyer
@@ -156,7 +155,7 @@ const Index = () => {
     toast.success("Configuración de letrado actualizada");
   };
 
-  const handleStatusChange = (queryId: string, status: QueryStatus) => {
+  const handleStatusChange = (queryId, status) => {
     setQueries(prev =>
       prev.map(query =>
         query.id === queryId ? { ...query, status } : query
@@ -169,7 +168,7 @@ const Index = () => {
     const reassigned = assignQueries(queries, lawyers);
     setQueries(reassigned);
     
-    const counts = new Map<string, number>();
+    const counts = new Map();
     reassigned.forEach(query => {
       if (query.assignedLawyerEmail) {
         const lawyer = lawyers.find(l => l.email === query.assignedLawyerEmail);
@@ -265,7 +264,7 @@ const Index = () => {
                       />
                     </div>
                   </div>
-                  <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as QueryStatus | "all")}>
+                  <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value)}>
                     <SelectTrigger className="w-full md:w-[200px]">
                       <Filter className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Estado" />
@@ -280,7 +279,7 @@ const Index = () => {
                       <SelectItem value="info_requested">Info. Solicitada</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select value={urgentFilter} onValueChange={(value) => setUrgentFilter(value as "all" | "urgent" | "normal")}>
+                  <Select value={urgentFilter} onValueChange={(value) => setUrgentFilter(value)}>
                     <SelectTrigger className="w-full md:w-[180px]">
                       <SelectValue placeholder="Urgencia" />
                     </SelectTrigger>

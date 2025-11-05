@@ -1,19 +1,13 @@
 import { Clock, AlertCircle, User, Calendar } from "lucide-react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Query, QueryStatus } from "@/types/query";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useState } from "react";
 import { QueryDetailDialog } from "./QueryDetailDialog";
 
-interface QueryCardProps {
-  query: Query;
-  onStatusChange: (queryId: string, status: QueryStatus) => void;
-}
-
-const statusConfig: Record<QueryStatus, { label: string; variant: "default" | "secondary" | "success" | "warning" | "destructive" }> = {
+const statusConfig = {
   pending: { label: "Pendiente", variant: "warning" },
   in_process: { label: "En Proceso", variant: "default" },
   completed: { label: "Finalizada", variant: "success" },
@@ -22,7 +16,7 @@ const statusConfig: Record<QueryStatus, { label: string; variant: "default" | "s
   info_requested: { label: "Solicitada información", variant: "secondary" }
 };
 
-export function QueryCard({ query, onStatusChange }: QueryCardProps) {
+export function QueryCard({ query, onStatusChange }) {
   const [showDetails, setShowDetails] = useState(false);
   const now = new Date();
   const timeToDeadline = query.deadline.getTime() - now.getTime();
@@ -89,7 +83,7 @@ export function QueryCard({ query, onStatusChange }: QueryCardProps) {
           <div className="pt-2 border-t border-border">
             <Select
               value={query.status}
-              onValueChange={(value) => onStatusChange(query.id, value as QueryStatus)}
+              onValueChange={(value) => onStatusChange(query.id, value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
