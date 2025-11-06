@@ -108,8 +108,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Emails de confirmación a Rocío y Andrea
     const confirmationEmails = [
-      "rocio@example.com", // Cambiar por el email real de Rocío
-      "andrea@example.com" // Cambiar por el email real de Andrea
+      "rgaitan@ramoncajal.com",
+      "adiaz@ramoncajal.com"
     ];
 
     const confirmationHtml = `
