@@ -9,28 +9,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface Query {
-  ritm: string;
-  typology: string;
-  isUrgent: boolean;
-  deadline: string;
-  status: string;
-}
-
-interface EmailRequest {
-  lawyerName: string;
-  lawyerEmail: string;
-  queries: Query[];
-  isAutomatic?: boolean;
-}
-
-const handler = async (req: Request): Promise<Response> => {
+const handler = async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { lawyerName, lawyerEmail, queries, isAutomatic = false }: EmailRequest = await req.json();
+    const { lawyerName, lawyerEmail, queries, isAutomatic = false } = await req.json();
 
     console.log(`Sending notification to ${lawyerName} (${lawyerEmail}) for ${queries.length} queries`);
 
@@ -157,7 +142,7 @@ const handler = async (req: Request): Promise<Response> => {
         },
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in send-lawyer-notification function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
